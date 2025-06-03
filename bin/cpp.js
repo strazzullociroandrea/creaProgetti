@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
@@ -22,7 +21,7 @@ const askQuestion = async (question) => {
     }
 };
 
-(async () => {
+async function createCppProject() {
     try {
         const projectName = await askQuestion("📦 Nome del progetto C++: ");
         const currentDir = process.cwd();
@@ -39,9 +38,10 @@ const askQuestion = async (question) => {
         // Crea main.cpp
         const mainCpp = `
 #include <iostream>
+using namespace std;
 
 int main() {
-    std::cout << "Hello from ${projectName}!" << std::endl;
+    cout << "Hello from ${projectName}!" << endl;
     return 0;
 }
 `;
@@ -76,6 +76,8 @@ make
 make clean
 \`\`\`
 `;
+        fs.writeFileSync(path.join(projectPath, "README.md"), readme);
+        console.log("📝 Creato: README.md");
 
         // Cartelle opzionali
         fs.mkdirSync(path.join(projectPath, "include"));
@@ -83,8 +85,10 @@ make clean
         console.log("📁 Cartelle 'include/' e 'src/' create.");
 
         console.log("✅ Progetto C++ creato con successo!");
-
     } catch (err) {
         console.error("❌ Errore:", err.message);
     }
-})();
+}
+
+module.exports = createCppProject;
+

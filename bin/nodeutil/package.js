@@ -20,7 +20,7 @@ const createPackageJson = (name, useModule) => {
     dependencies: {}
   };
 
-  if (useModule.toLowerCase() === "y") {
+  if (useModule == "Y" || useModule == "y") {
     packageJson.type = "module";
   }
 

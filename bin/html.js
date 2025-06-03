@@ -22,7 +22,7 @@ const askQuestion = async (question) => {
     }
 };
 
-(async () => {
+module.exports = async function createHtmlProject() {
     try {
         const projectName = await askQuestion("🧱 Nome del progetto: ");
         const currentDir = process.cwd();
@@ -69,4 +69,4 @@ const askQuestion = async (question) => {
     } catch (err) {
         console.error("❌ Errore:", err.message);
     }
-})();
+};

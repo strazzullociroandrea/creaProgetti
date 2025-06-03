@@ -4,19 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 const htmlBase = require("./nodeutil/htmlBase");
-const createPackageJson = require("./nodeutil/createPackageJson");
+const createPackageJson = require("./nodeutil/package");
 const mainImport = require("./nodeutil/import");
 const mainRequire = require("./nodeutil/require");
 const https = require('https');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
 
-if (process.argv.includes('--version')) {
-    const packageJsonPath = path.join(__dirname, '..', 'package.json');
-    console.log(`Versione: ${ JSON.parse(fs.readFileSync(packageJsonPath)).version }`);
-    process.exit(0);
-}
- 
 function isValidGitHubUrl(url) {
     const regex = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(\.git)?$/;
     return regex.test(url);
@@ -63,11 +57,28 @@ async function askQuestion(question) {
     }
 }
 
-(async () => {
+async function createProject() {
     try {
-        const currentDir = process.cwd();
+        const rootDir = process.cwd();
+
+        // Version check può restare fuori o dentro createProject a seconda di come richiami il modulo
+        if (process.argv.includes('--version')) {
+            const packageJsonPath = path.join(__dirname, '..', 'package.json');
+            console.log(`Versione: ${ JSON.parse(fs.readFileSync(packageJsonPath)).version }`);
+            process.exit(0);
+        }
 
         const nomeProgetto = await askQuestion("Inserisci il nome del progetto: ");
+
+        // Creo la cartella del progetto e cambio dir di lavoro
+        const projectPath = path.join(rootDir, nomeProgetto);
+        if (fs.existsSync(projectPath)) {
+            console.error(`❌ La cartella ${nomeProgetto} esiste già. Scegli un nome diverso o elimina la cartella.`);
+            process.exit(1);
+        }
+        fs.mkdirSync(projectPath);
+        process.chdir(projectPath); // <-- Qui cambio la working directory dentro la cartella progetto
+        console.log(`📂 Cartella progetto creata e spostato in: ${projectPath}`);
 
         let isModule;
         do {
@@ -112,7 +123,7 @@ async function askQuestion(question) {
         } while (isNaN(porta) || Number(porta) <= 0);
         porta = Number(porta);
 
-        const dirPublic = path.join(currentDir, 'public');
+        const dirPublic = path.join(process.cwd(), 'public');
         if (!fs.existsSync(dirPublic)) {
             fs.mkdirSync(dirPublic, { recursive: true });
             console.log("📁 Cartella 'public' creata.");
@@ -124,7 +135,7 @@ async function askQuestion(question) {
             console.log("📝 File 'index.html' creato.");
         }
 
-        const assetsDir = path.join(currentDir, 'assets');
+        const assetsDir = path.join(process.cwd(), 'assets');
         if (!fs.existsSync(assetsDir)) {
             fs.mkdirSync(assetsDir, { recursive: true });
             console.log("📁 Cartella 'assets' creata.");
@@ -148,11 +159,11 @@ async function askQuestion(question) {
             console.log("✅ File 'conf.json' già valido. Nessuna modifica.");
         }
 
-        const packagePath = path.join(currentDir, 'package.json');
+        const packagePath = path.join(process.cwd(), 'package.json');
         fs.writeFileSync(packagePath, createPackageJson(nomeProgetto, isModule.toLowerCase() === 'y'), 'utf8');
         console.log("📝 File 'package.json' scritto.");
 
-        const indexJsPath = path.join(currentDir, 'index.js');
+        const indexJsPath = path.join(process.cwd(), 'index.js');
         fs.writeFileSync(indexJsPath, isModule.toLowerCase() === 'y' ? mainImport() : mainRequire(), 'utf8');
         console.log("📝 File 'index.js' scritto.");
 
@@ -167,4 +178,7 @@ async function askQuestion(question) {
     } catch (error) {
         console.error("❌ Errore durante la creazione del progetto:", error.message);
     }
-})();
+}
+
+// Esportiamo la funzione
+module.exports = createProject;

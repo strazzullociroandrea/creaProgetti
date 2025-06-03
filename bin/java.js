@@ -1,8 +1,8 @@
-#!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const { promisify } = require('util');
+const { execSync } = require('child_process');
 
 async function askQuestion(query) {
   const rl = readline.createInterface({
@@ -21,7 +21,7 @@ async function askQuestion(query) {
   }
 }
 
-(async () => {
+async function createJavaProject() {
   try {
     const currentDir = process.cwd();
 
@@ -29,19 +29,19 @@ async function askQuestion(query) {
     const basePackage = await askQuestion("Inserisci il package base (es. com.example): ");
     const packagePath = basePackage.replace(/\./g, path.sep);
 
-    // Creo cartelle essenziali
+    // Creo cartelle essenziali, incluse quelle per Main.java
     const dirsToCreate = [
-      `src/main/java/${packagePath}`,
-      'src/main/resources'
+      path.join(nomeProgetto, 'src', 'main', 'java', packagePath),
+      path.join(nomeProgetto, 'src', 'main', 'resources')
     ];
 
     dirsToCreate.forEach(dir => {
-      const fullPath = path.join(currentDir, nomeProgetto, dir);
+      const fullPath = path.join(currentDir, dir);
       fs.mkdirSync(fullPath, { recursive: true });
       console.log(`📁 Cartella creata: ${fullPath}`);
     });
 
-    // build.gradle
+    // Creo build.gradle
     const buildGradle = `
 plugins {
     id 'java'
@@ -63,12 +63,12 @@ application {
     fs.writeFileSync(path.join(currentDir, nomeProgetto, 'build.gradle'), buildGradle, 'utf8');
     console.log("📝 File 'build.gradle' creato.");
 
-    // settings.gradle
+    // Creo settings.gradle
     const settingsGradle = `rootProject.name = '${nomeProgetto}'`;
     fs.writeFileSync(path.join(currentDir, nomeProgetto, 'settings.gradle'), settingsGradle, 'utf8');
     console.log("📝 File 'settings.gradle' creato.");
 
-    // Main.java
+    // Creo Main.java
     const mainJava = `
 package ${basePackage};
 
@@ -83,14 +83,45 @@ public class Main {
     fs.writeFileSync(path.join(mainJavaPath, 'Main.java'), mainJava, 'utf8');
     console.log(`📝 File 'Main.java' creato in: ${mainJavaPath}`);
 
+    // Creo run.sh (Linux/macOS)
+    const runShContent = `#!/bin/bash
+mkdir -p out
+javac -d out src/main/java/${packagePath.replace(/\\/g, '/')}/*.java
+if [ $? -eq 0 ]; then
+  java -cp out ${basePackage}.Main
+else
+  echo "Compilazione fallita"
+fi
+`;
+    const runShPath = path.join(currentDir, nomeProgetto, 'run.sh');
+    fs.writeFileSync(runShPath, runShContent, { mode: 0o755 });
+    console.log("📝 File 'run.sh' creato e reso eseguibile.");
+
+    // Creo run.bat (Windows)
+    const runBatContent = `
+@echo off
+if not exist out (
+  mkdir out
+)
+javac -d out src\\main\\java\\${packagePath}\\*.java
+if %errorlevel% neq 0 (
+  echo Compilazione fallita
+  exit /b %errorlevel%
+)
+java -cp out ${basePackage}.Main
+pause
+`;
+    const runBatPath = path.join(currentDir, nomeProgetto, 'run.bat');
+    fs.writeFileSync(runBatPath, runBatContent);
+    console.log("📝 File 'run.bat' creato.");
+
     console.log(`✅ Progetto Java '${nomeProgetto}' creato correttamente in: ${path.join(currentDir, nomeProgetto)}`);
-    console.log(`Apri la cartella in VSCode o altro IDE e inizia a sviluppare.`);
-    console.log(`Per compilare ed eseguire (se hai Gradle):`);
-    console.log(`  cd ${nomeProgetto}`);
-    console.log(`  ./gradlew run   (Linux/macOS)`);
-    console.log(`  gradlew.bat run (Windows)`);
+    console.log(`Usa 'run.sh' (Linux/macOS) o 'run.bat' (Windows) per compilare ed eseguire il progetto.`);
 
   } catch (e) {
     console.error('❌ Errore durante la creazione del progetto:', e.message);
   }
-})();
+}
+
+// Esportiamo la funzione così può essere richiamata da altri file
+module.exports = createJavaProject;
