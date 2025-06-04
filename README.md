@@ -1,39 +1,66 @@
 # Welcome to creaprogetto 👋
-[![Version](https://img.shields.io/npm/v/creaprogetto.svg)](https://www.npmjs.com/package/creaprogetto)
-[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://www.npmjs.com/package/creaprogetto)
+
+[![Version](https://img.shields.io/npm/v/creaprogetto.svg)](https://www.npmjs.com/package/creaprogetto)  
+[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://www.npmjs.com/package/creaprogetto)  
 [![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](#)
 
-> creaprogetto è uno strumento da riga di comando pensato per semplificare e velocizzare la creazione di progetti di sviluppo. Consente di generare automaticamente la struttura base di progetti nei linguaggi e ambienti più comuni: Java, Node.js, HTML/CSS/JavaScript e C++.Con un'interfaccia interattiva semplice e intuitiva, creaprogetto permette di scegliere il tipo di progetto da generare e crea per te una directory con struttura organizzata e pronta all’uso, completa di file essenziali come README.md, .gitignore, main.* e cartelle standard per ogni linguaggio.
+> **creaprogetto** è uno strumento da riga di comando pensato per semplificare e velocizzare la creazione di progetti software.  
+> Supporta la generazione automatica di strutture base per i linguaggi e ambienti più comuni: **Java**, **Node.js**, **HTML/CSS/JavaScript** e **C++**.
 
-## Install
+Con un'interfaccia interattiva semplice e intuitiva, `creaprogetto` ti guida nella scelta del tipo di progetto da creare, generando per te una struttura di directory completa e pronta all’uso, comprensiva di file essenziali come `README.md`, `.gitignore`, `main.*` e cartelle organizzate per ogni linguaggio.
 
-```sh
-npm install
+---
+
+## 🚀 Installazione
+
+### Installazione Globale
+
+```bash
+npm install -g creaprogetto
 ```
 
-## Usage
+### Installazione Locale
 
-```sh
-per installare globalmente il package: npm install -g creaprogetto. Per generare un progetto: creaprogetto init tipo, dove tipo è java/nodejs/html/cpp
+```bash
+npm install creaprogetto
 ```
 
-## Run tests
+---
 
-```sh
-npm run test
+## 🧪 Utilizzo
+
+### Creazione di un nuovo progetto
+
+```bash
+creaprogetto init <tipo>
 ```
 
-## Author
+Dove `<tipo>` può essere uno dei seguenti:
 
-👤 **Ciro Andrea Strazzullo**
+- `java`
+- `nodejs`
+- `html`
+- `cpp`
 
-* Github: [@strazzullociroandrea](https://github.com/strazzullociroandrea)
-* LinkedIn: [@www.linkedin.com\/in\/ciro-strazzullo-8484a5339](https://linkedin.com/in/www.linkedin.com\/in\/ciro-strazzullo-8484a5339)
+Esempio:
 
-## Show your support
+```bash
+creaprogetto init nodejs
+```
 
-Give a ⭐️ if this project helped you!
+---
 
+## 👤 Autore
 
-***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+**Ciro Andrea Strazzullo**
+
+- GitHub: [@strazzullociroandrea](https://github.com/strazzullociroandrea)
+- LinkedIn: [Ciro Andrea Strazzullo](https://www.linkedin.com/in/ciro-strazzullo-8484a5339)
+
+---
+
+## ⭐️ Supporta il progetto
+
+Se questo progetto ti è stato utile, o pensi di poter apportare migliorie non esitare!
+---
+
