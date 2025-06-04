@@ -15,6 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 const server = http.createServer(app);
+const conf = JSON.parse(fs.readFileSync('./assets/conf.json'));
 
 
 (()=>{
@@ -30,7 +31,7 @@ const server = http.createServer(app);
         app.use("/", express.static(path.join(__dirname, "public")));
 
         server.listen(conf.port, () => {
-            console.log("---> server running on http://localhost:" + conf.port);
+            console.log("---> server running on http://localhost:" + conf.porta);
         });
     
     }catch(error){

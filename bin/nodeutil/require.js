@@ -11,7 +11,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const app = express();
 const server = http.createServer(app);
-const conf = JSON.parse(fs.readFileSync('conf.json'));
+const conf = JSON.parse(fs.readFileSync('./assets/conf.json'));
 
 (()=>{
     try{
@@ -26,7 +26,7 @@ const conf = JSON.parse(fs.readFileSync('conf.json'));
         app.use("/", express.static(path.join(__dirname, "public")));
 
         server.listen(conf.port, () => {
-            console.log("---> server running on http://localhost:" + conf.port);
+            console.log("---> server running on http://localhost:" + conf.porta);
         });
     
     }catch(error){
