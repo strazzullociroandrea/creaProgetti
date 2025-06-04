@@ -27,44 +27,13 @@ async function createJavaProject() {
 
     const nomeProgetto = await askQuestion("Inserisci il nome del progetto Java: ");
 
-    // Creo cartelle essenziali
+    // Creo solo la cartella src
     const srcDir = path.join(nomeProgetto, 'src');
-    const resourcesDir = path.join(nomeProgetto, 'resources');
+    const fullSrcPath = path.join(currentDir, srcDir);
+    fs.mkdirSync(fullSrcPath, { recursive: true });
+    console.log(`📁 Cartella creata: ${fullSrcPath}`);
 
-    [srcDir, resourcesDir].forEach(dir => {
-      const fullPath = path.join(currentDir, dir);
-      fs.mkdirSync(fullPath, { recursive: true });
-      console.log(`📁 Cartella creata: ${fullPath}`);
-    });
-
-    // Creo build.gradle
-    const buildGradle = `
-plugins {
-    id 'java'
-    id 'application'
-}
-
-group 'main'
-version '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
-application {
-    mainClass = 'Main'
-}
-`.trim();
-
-    fs.writeFileSync(path.join(currentDir, nomeProgetto, 'build.gradle'), buildGradle, 'utf8');
-    console.log("📝 File 'build.gradle' creato.");
-
-    // Creo settings.gradle
-    const settingsGradle = `rootProject.name = '${nomeProgetto}'`;
-    fs.writeFileSync(path.join(currentDir, nomeProgetto, 'settings.gradle'), settingsGradle, 'utf8');
-    console.log("📝 File 'settings.gradle' creato.");
-
-    // Creo Main.java in src
+    // Creo Main.java
     const mainJava = `
 public class Main {
     public static void main(String[] args) {
@@ -73,7 +42,7 @@ public class Main {
 }
 `.trim();
 
-    const mainJavaPath = path.join(currentDir, srcDir, 'Main.java');
+    const mainJavaPath = path.join(fullSrcPath, 'Main.java');
     fs.writeFileSync(mainJavaPath, mainJava, 'utf8');
     console.log(`📝 File 'Main.java' creato in: ${mainJavaPath}`);
 
