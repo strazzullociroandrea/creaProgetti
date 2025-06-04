@@ -1,11 +1,10 @@
 {
   "name": "creaprogetto",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
   "author": "Ciro Andrea Strazzullo",
   "license": "ISC",
   "description": "",
@@ -19,5 +18,7 @@
     "path": "^0.12.7",
     "readline": "^1.3.0",
     "util": "^0.12.5"
-  }
+  },
+  "keywords": ["project generator", "cli", "starter", "java", "nodejs", "html", "c++", "creazione progetti"],
+
 }
