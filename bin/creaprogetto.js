@@ -1,14 +1,23 @@
 #!/usr/bin/env node
 
+const fs = require('fs');
+const path = require('path');
+
 const args = process.argv.slice(2);
 
-// Version check può restare fuori o dentro createProject a seconda di come richiami il modulo
-if (process.argv.includes('--version')) {
-  const packageJsonPath = path.join(__dirname, '..', 'package.json');
-  console.log(`Versione: ${ JSON.parse(fs.readFileSync(packageJsonPath)).version }`);
+// Version check
+if (args.includes('--version')) {
+  try {
+    const packageJsonPath = path.join(__dirname, '..', 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    console.log(`Versione: ${packageJson.version}`);
+  } catch (e) {
+    console.error('Impossibile leggere la versione dal package.json');
+  }
   process.exit(0);
 }
 
+// Controllo argomenti
 if (args.length < 2 || args[0] !== 'init') {
   console.log('Uso: creaprogetto init [nodejs|java|html|cpp|astro|python]');
   process.exit(1);
@@ -16,7 +25,7 @@ if (args.length < 2 || args[0] !== 'init') {
 
 const projectType = args[1].toLowerCase();
 
-switch(projectType) {
+switch (projectType) {
   case 'nodejs':
     require('./nodejs')();
     break;
@@ -26,7 +35,9 @@ switch(projectType) {
   case 'html':
     require('./html')();
     break;
-  case 'cpp' || 'c++' || 'c':
+  case 'cpp':
+  case 'c++':
+  case 'c':
     require('./cpp')();
     break;
   case 'astro':

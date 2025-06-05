@@ -25,68 +25,115 @@ function githubRepoExists(url) {
 async function executePrompt(command) {
     try {
         const { stdout, stderr } = await execAsync(command);
-        if (stderr) {
-            console.error("⚠️ Errore:", stderr);
+        if (stderr && stderr.trim()) {
+            console.warn("⚠️  Stderr:", stderr);
         }
         return stdout;
     } catch (error) {
-        console.error("❌ Errore durante l'esecuzione:", error.message);
+        console.error(`❌ Errore eseguendo: ${command}`);
+        console.error(error.message);
+        return null;
     }
 }
 
-module.exports = async() =>{ 
+async function askQuestion(question) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    const answer = await new Promise(resolve => rl.question(question, resolve));
+    rl.close();
+    return answer.trim();
+}
+
+function createFileIfNotExists(filePath, content) {
+    if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, content.trim() + '\n', 'utf8');
+        console.log(`📄 File '${path.basename(filePath)}' creato.`);
+    }
+}
+
+async function gitIsAvailable() {
+    try {
+        await execAsync("git --version");
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+module.exports = async () => {
     const rootDir = process.cwd();
-    const nomeProgetto = askQuestion("Inserisci il nome del progetto: ");
+    const nomeProgetto = await askQuestion("📦 Inserisci il nome del progetto: ");
     const projectPath = path.join(rootDir, nomeProgetto);
+
     if (fs.existsSync(projectPath)) {
-        console.error(`❌ La cartella ${nomeProgetto} esiste già. Scegli un nome diverso o elimina la cartella.`);
+        console.error(`❌ La cartella '${nomeProgetto}' esiste già.`);
         process.exit(1);
     }
-    fs.mkdirSync(projectPath);
-    process.chdir(projectPath); 
 
-    const paginaMain = `
+    fs.mkdirSync(projectPath);
+    process.chdir(projectPath);
+
+    const hasGit = await gitIsAvailable();
+
+    let isGithub = "n";
+    if (hasGit) {
+        do {
+            isGithub = await askQuestion("🔧 Vuoi collegare una repo GitHub (y/n)? ");
+        } while (!['y', 'n'].includes(isGithub.toLowerCase()));
+    } else {
+        console.warn("⚠️  Git non è installato. Operazioni Git disabilitate.");
+    }
+
+    if (hasGit && isGithub.toLowerCase() === "y") {
+        let repositoryUrl;
+        while (true) {
+            repositoryUrl = await askQuestion("🔗 Inserisci l'URL della repository GitHub: ");
+            const isValid = isValidGitHubUrl(repositoryUrl);
+            const exists = isValid ? await githubRepoExists(repositoryUrl) : false;
+
+            if (!isValid) {
+                console.log("❌ URL non valida. Deve essere del tipo: https://github.com/utente/progetto.git");
+            } else if (!exists) {
+                console.log("⚠️  Repository non trovata o non accessibile.");
+            } else {
+                console.log("✅ Repository valida. Inizializzazione...");
+                await executePrompt("rm -rf .git");
+                await executePrompt("git init");
+                await executePrompt(`git remote add origin ${repositoryUrl}`);
+
+                const pulled = await executePrompt("git pull origin main") ||
+                               await executePrompt("git pull origin master");
+
+                if (pulled) {
+                    console.log("📥 Codice importato dalla repository.");
+                } else {
+                    console.log("⚠️  Nessun branch remoto 'main' o 'master' trovato.");
+                }
+                break;
+            }
+        }
+    }
+
+    // ✅ Crea solo se non esistono (es. dopo la pull)
+    createFileIfNotExists('main.py', `
 def saluta(): 
     print("Hello world")
 
 if __name__ == "__main__":
     saluta()
-`;
-    const indexPath = path.join(dirPublic, 'main.py');
-    if (!fs.existsSync(indexPath)) {
-        fs.writeFileSync(indexPath, paginaMain, 'utf8');
-        console.log("📝 File 'main.py' creato.");
-    }
-    let isGithub;
-    do {
-        sGithub = await askQuestion("Vuoi usare github (y/n)? ");
-    } while (!['y', 'n'].includes(isGithub.toLowerCase()));
+    `);
 
-    let repositoryUrl;
-    if (isGithub.toLowerCase() === "y") {
-        do {
-        repositoryUrl = await askQuestion("🔗 Inserisci l'URL della repository GitHub: ");
-        const isValid = isValidGitHubUrl(repositoryUrl);
-        const exists = isValid ? await githubRepoExists(repositoryUrl) : false;
+    createFileIfNotExists('README.md', `# ${nomeProgetto}\n\nDescrizione del progetto Python.`);
+    createFileIfNotExists('requirements.txt', `# Inserisci le dipendenze qui`);
+    createFileIfNotExists('.gitignore', `
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+`);
 
-        if (!isValid) {
-            console.log("❌ URL non valida. Deve essere del tipo: https://github.com/utente/progetto.git");
-        } else if (!exists) {
-            console.log("⚠️ Repository non trovata o non accessibile.");
-        } else {
-            console.log("✅ Repository valida e trovata.");
-            await executePrompt("rm -rf .git");
-            await executePrompt("git init");
-            const remotes = await executePrompt("git remote");
-            if (remotes && remotes.includes("origin")) {
-                console.log("🔁 Remote 'origin' già presente. Rimuovo...");
-                await executePrompt("git remote remove origin");
-            }
-                await executePrompt(`git remote add origin ${repositoryUrl}`);
-                await executePrompt("git pull origin main || git pull origin master");
-                break;
-            }
-        } while (true);
-    }
-    console.log("Progetto creato con successo!");
-}
+    console.log("✅ Progetto Python creato con successo nella cartella:", nomeProgetto);
+};
