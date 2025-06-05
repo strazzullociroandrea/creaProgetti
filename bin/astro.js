@@ -50,39 +50,36 @@ module.exports = async () => {
       process.exit(1);
     }
 
-    // Chiedi il nome del progetto prima
-    const projectName = await askQuestion('📦 Inserisci il nome del progetto Astro: ');
-    if (!projectName) {
-      console.error('❌ Nome progetto non valido');
-      process.exit(1);
-    }
+    const projectName = await askQuestion('📦 Inserisci il nome del progetto Astro (per info, non obbligatorio): ');
 
-    // Esegui il comando in modo non interattivo se possibile, specificando il nome
-    // Se non si può, almeno facciamo il cd dopo la creazione
+    // Esegui il comando interattivo (lasciando a npm create astro@latest il prompt)
+    execSync('npm create astro@latest', { stdio: 'inherit' });
 
-    // Qui usa il flag -- --template minimal per creare progetto minimal e senza prompt
-    execSync(`npm create astro@latest ${projectName} -- --template minimal`, { stdio: 'inherit' });
+    // Se l’utente ha inserito un nome progetto, prova a scrivere README.md e .gitignore nella cartella relativa
+    if (projectName) {
+      const projectPath = path.join(process.cwd(), projectName);
 
-    const projectPath = path.join(process.cwd(), projectName);
-
-    // README.md base dentro la cartella progetto
-    const readmePath = path.join(projectPath, 'README.md');
-    const readmeContent = `# ${projectName}
+      // Controlla che esista la cartella progetto prima di scrivere i file
+      if (fs.existsSync(projectPath)) {
+        const readmePath = path.join(projectPath, 'README.md');
+        const readmeContent = `# ${projectName}
 
 Progetto creato con \`npm create astro@latest\`.
 `;
+        writeIfMissing(readmePath, readmeContent, 'creato');
 
-    writeIfMissing(readmePath, readmeContent, 'creato');
-
-    // .gitignore base dentro la cartella progetto
-    const gitignorePath = path.join(projectPath, '.gitignore');
-    const gitignoreContent = `node_modules/
+        const gitignorePath = path.join(projectPath, '.gitignore');
+        const gitignoreContent = `node_modules/
 dist/
 .astro/
 .env
 `;
+        writeIfMissing(gitignorePath, gitignoreContent, 'creato');
+      } else {
+        console.warn(`⚠️ La cartella del progetto '${projectName}' non è stata trovata, salto la creazione di README.md e .gitignore`);
+      }
+    }
 
-    writeIfMissing(gitignorePath, gitignoreContent, 'creato');
   } catch (error) {
     console.error('❌ Errore durante la creazione del progetto Astro:', error.message);
     process.exit(1);
