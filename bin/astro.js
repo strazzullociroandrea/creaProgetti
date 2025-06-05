@@ -2,6 +2,26 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
+const { promisify } = require('util');
+
+const askQuestion = async (question) => {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  const questionAsync = promisify(rl.question).bind(rl);
+
+  let answer;
+  try {
+    do {
+      answer = await questionAsync(question);
+    } while (!answer.trim());
+    return answer.trim();
+  } finally {
+    rl.close();
+  }
+};
 
 function commandExists(cmd) {
   try {
@@ -19,7 +39,7 @@ function writeIfMissing(filePath, content, description) {
   }
 }
 
-module.exports = () => {
+module.exports = async () => {
   try {
     if (!commandExists('node')) {
       console.error('❌ Node.js non è installato o non è nel PATH.');
@@ -30,23 +50,32 @@ module.exports = () => {
       process.exit(1);
     }
 
-    // Esegui comando di creazione Astro (mostra output in tempo reale)
-    execSync('npm create astro@latest', { stdio: 'inherit' });
+    // Chiedi il nome del progetto prima
+    const projectName = await askQuestion('📦 Inserisci il nome del progetto Astro: ');
+    if (!projectName) {
+      console.error('❌ Nome progetto non valido');
+      process.exit(1);
+    }
 
-    // Dopo creazione, se non c'è Git o non viene usato, crea README.md e .gitignore base
-    const cwd = process.cwd();
+    // Esegui il comando in modo non interattivo se possibile, specificando il nome
+    // Se non si può, almeno facciamo il cd dopo la creazione
 
-    // README.md base
-    const readmePath = path.join(cwd, 'README.md');
-    const readmeContent = `# Progetto Astro
+    // Qui usa il flag -- --template minimal per creare progetto minimal e senza prompt
+    execSync(`npm create astro@latest ${projectName} -- --template minimal`, { stdio: 'inherit' });
+
+    const projectPath = path.join(process.cwd(), projectName);
+
+    // README.md base dentro la cartella progetto
+    const readmePath = path.join(projectPath, 'README.md');
+    const readmeContent = `# ${projectName}
 
 Progetto creato con \`npm create astro@latest\`.
 `;
 
     writeIfMissing(readmePath, readmeContent, 'creato');
 
-    // .gitignore base
-    const gitignorePath = path.join(cwd, '.gitignore');
+    // .gitignore base dentro la cartella progetto
+    const gitignorePath = path.join(projectPath, '.gitignore');
     const gitignoreContent = `node_modules/
 dist/
 .astro/
@@ -54,7 +83,6 @@ dist/
 `;
 
     writeIfMissing(gitignorePath, gitignoreContent, 'creato');
-
   } catch (error) {
     console.error('❌ Errore durante la creazione del progetto Astro:', error.message);
     process.exit(1);
