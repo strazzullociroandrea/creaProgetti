@@ -25,7 +25,7 @@ const conf = JSON.parse(fs.readFileSync('./assets/conf.json'));
 
         app.use("/", express.static(path.join(__dirname, "public")));
 
-        server.listen(conf.port, () => {
+        server.listen(conf.porta, () => {
             console.log("---> server running on http://localhost:" + conf.porta);
         });
     
