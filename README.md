@@ -41,6 +41,8 @@ Dove `<tipo>` può essere uno dei seguenti:
 - `nodejs`
 - `html`
 - `cpp`
+- `astro`
+- `python`
 
 Esempio:
 
@@ -59,8 +61,9 @@ creaprogetto init nodejs
 
 ---
 
-## ⭐️ Supporta il progetto
+## ⭐️ Supporta il progetto ##
 
-Se questo progetto ti è stato utile, o pensi di poter apportare migliorie non esitare!
+Se questo progetto ti è sembrato utile o vuoi dare delle opinioni non esitare a scrivermi!
+
 ---
 
