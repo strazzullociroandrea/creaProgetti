@@ -60,14 +60,7 @@ async function askQuestion(question) {
 async function createProject() {
     try {
         const rootDir = process.cwd();
-
-        // Version check può restare fuori o dentro createProject a seconda di come richiami il modulo
-        if (process.argv.includes('--version')) {
-            const packageJsonPath = path.join(__dirname, '..', 'package.json');
-            console.log(`Versione: ${ JSON.parse(fs.readFileSync(packageJsonPath)).version }`);
-            process.exit(0);
-        }
-
+ 
         const nomeProgetto = await askQuestion("Inserisci il nome del progetto: ");
 
         // Creo la cartella del progetto e cambio dir di lavoro
