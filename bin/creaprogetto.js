@@ -3,7 +3,7 @@
 const args = process.argv.slice(2);
 
 if (args.length < 2 || args[0] !== 'init') {
-  console.log('Uso: creaprogetto init [nodejs|java|html|cpp]');
+  console.log('Uso: creaprogetto init [nodejs|java|html|cpp|astro]');
   process.exit(1);
 }
 
@@ -22,6 +22,9 @@ switch(projectType) {
   case 'cpp':
     require('./cpp')();
     break;
+  case 'astro':
+    require('./astro')();
+  break;
   default:
     console.log(`Tipo progetto non supportato: ${projectType}`);
     process.exit(1);
