@@ -43,6 +43,7 @@ Dove `<tipo>` può essere uno dei seguenti:
 - `cpp`
 - `astro`
 - `python`
+- `react (react+vite)`
 
 Esempio:
 

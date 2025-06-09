@@ -36,23 +36,18 @@ function checkGitHubRepoExists(url) {
 
 async function creaReact() {
   try {
-    const nomeProgetto = await prompt('📦 Nome del progetto React + Vite: ');
-    const projectPath = path.join(process.cwd(), nomeProgetto);
+    const nomeProgetto = await prompt('📦 Inserisci il nome del progetto React + Vite: ');
 
-    if (fs.existsSync(projectPath)) {
-      console.error('❌ La cartella esiste già. Esci.');
-      return;
-    }
-
-    // Crea il progetto con Vite
+    // Crea progetto con Vite (che genera anche la directory)
     execSync(`npm create vite@latest ${nomeProgetto} -- --template react`, { stdio: 'inherit' });
 
+    const projectPath = path.join(process.cwd(), nomeProgetto);
     process.chdir(projectPath);
+
     execSync('npm install', { stdio: 'inherit' });
 
     const githubUrl = await prompt('🔗 Inserisci il link del repo GitHub (facoltativo): ');
 
-    let repoOk = false;
     if (githubUrl) {
       const exists = await checkGitHubRepoExists(githubUrl);
       if (exists) {
@@ -61,24 +56,21 @@ async function creaReact() {
           execSync('git init', { stdio: 'ignore' });
           execSync(`git remote add origin ${githubUrl}`, { stdio: 'ignore' });
           console.log('✅ Repository GitHub collegato.');
-          repoOk = true;
         }
       } else {
         console.warn('⚠️ Il repository GitHub non esiste o non è raggiungibile.');
       }
     }
 
-    // Crea .gitignore se non esiste
-    const gitignorePath = path.join(projectPath, '.gitignore');
-    if (!fs.existsSync(gitignorePath)) {
-      fs.writeFileSync(gitignorePath, 'node_modules\n/dist\n');
+    // Crea .gitignore se mancante
+    if (!fs.existsSync('.gitignore')) {
+      fs.writeFileSync('.gitignore', 'node_modules\n/dist\n');
       console.log('📝 Creato .gitignore');
     }
 
-    // Crea README.md se non esiste
-    const readmePath = path.join(projectPath, 'README.md');
-    if (!fs.existsSync(readmePath)) {
-      fs.writeFileSync(readmePath, `# ${nomeProgetto}\n\nCreato con \`creaprogetto\` + Vite + React.\n`);
+    // Crea README.md se mancante
+    if (!fs.existsSync('README.md')) {
+      fs.writeFileSync('README.md', `# ${nomeProgetto}\n\nCreato con \`creaprogetto\` + Vite + React.\n`);
       console.log('📝 Creato README.md');
     }
 
