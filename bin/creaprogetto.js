@@ -46,6 +46,9 @@ switch (projectType) {
   case 'python':
     require('./python')();
     break;
+  case 'react':
+    require('./react')();
+    break;
   default:
     console.log(`Tipo progetto non supportato: ${projectType}`);
     process.exit(1);
