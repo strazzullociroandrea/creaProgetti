@@ -1,6 +1,6 @@
 {
   "name": "creaprogetto",
-  "version": "12.0.0",
+  "version": "13.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
