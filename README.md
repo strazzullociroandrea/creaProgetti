@@ -5,7 +5,7 @@
 [![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](#)
 
 > **creaprogetto** è uno strumento da riga di comando pensato per semplificare e velocizzare la creazione di progetti software.  
-> Supporta la generazione automatica di strutture base per i linguaggi e ambienti più comuni: **Java**, **Node.js**, **HTML/CSS/JavaScript** e **C++**.
+> Supporta la generazione automatica di strutture base per i linguaggi e ambienti più comuni: **Java**, **Node.js**, **HTML/CSS/JavaScript**, **C++**, **astro**, **python**, **react (react+vite)** e ** nextjs base**.
 
 Con un'interfaccia interattiva semplice e intuitiva, `creaprogetto` ti guida nella scelta del tipo di progetto da creare, generando per te una struttura di directory completa e pronta all’uso, comprensiva di file essenziali come `README.md`, `.gitignore`, `main.*` e cartelle organizzate per ogni linguaggio.
 
