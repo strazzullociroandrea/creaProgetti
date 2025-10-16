@@ -44,11 +44,19 @@ Dove `<tipo>` può essere uno dei seguenti:
 - `astro`
 - `python`
 - `react (react+vite)`
+- `nextjs`
 
 Esempio:
 
 ```bash
+creaprogetto init java
 creaprogetto init nodejs
+creaprogetto init html
+creaprogetto init cpp
+creaprogetto init astro
+creaprogetto init python
+creaprogetto init react
+creaprogetto init nextjs
 ```
 
 ---
